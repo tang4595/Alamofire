@@ -478,6 +478,47 @@ final class DataStreamConcurrencyTests: BaseTestCase {
 }
 
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+final class WebSocketConcurrencyTests: BaseTestCase {
+    func testThatWebSocketTaskCanStreamEvents() async {
+        // Given
+        let session = stored(Session())
+
+        // When
+        let task = session.websocketRequest(.websocket()).webSocketTask()
+        let events = await task.streamingEvents().collect()
+
+        // Then
+        XCTAssertEqual(events.count, 4)
+        XCTAssertEqual(events.compactMap(\.message).count, 1)
+    }
+
+    func testThatWebSocketTaskCanSendMessage() async {
+        // Given
+        let session = stored(Session())
+        let message = URLSessionWebSocketTask.Message.string("echo")
+
+        // When
+        let task = session.websocketRequest(.websocketEcho).webSocketTask()
+        var events: [WebSocketRequest.Event<URLSessionWebSocketTask.Message, Never>] = []
+        var sent: Result<Void, Error>?
+        for await event in task.streamingEvents() {
+            if case .connected = event.kind {
+                sent = await task.send(message)
+            } else if case .receivedMessage = event.kind {
+                task.cancel(with: .normalClosure)
+            }
+
+            events.append(event)
+        }
+
+        // Then
+        XCTAssertTrue(sent?.isSuccess == true)
+        XCTAssertEqual(events.count, 4)
+        XCTAssertEqual(events.compactMap(\.message), [message])
+    }
+}
+
+@available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 final class ClosureAPIConcurrencyTests: BaseTestCase {
     func testThatDownloadProgressStreamReturnsProgress() async {
         // Given
