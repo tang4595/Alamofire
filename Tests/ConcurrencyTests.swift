@@ -477,6 +477,7 @@ final class DataStreamConcurrencyTests: BaseTestCase {
     }
 }
 
+#if !(os(Linux) || os(Windows))
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 final class WebSocketConcurrencyTests: BaseTestCase {
     func testThatWebSocketTaskCanStreamEvents() async {
@@ -517,6 +518,7 @@ final class WebSocketConcurrencyTests: BaseTestCase {
         XCTAssertEqual(events.compactMap(\.message), [message])
     }
 }
+#endif
 
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 final class ClosureAPIConcurrencyTests: BaseTestCase {

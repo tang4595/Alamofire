@@ -168,11 +168,13 @@ final class WebSocketTests: BaseTestCase {
         var receivedCompletion: WebSocketRequest.Completion?
 
         // When
-        let request = session.websocketRequest(.websocketEcho).responseMessage { event in
+        let request = session.websocketRequest(.websocketEcho)
+        request.responseMessage { event in
             switch event.kind {
             case let .connected(`protocol`):
                 connectedProtocol = `protocol`
                 didConnect.fulfill()
+                request.send(sentMessage) { _ in didSend.fulfill() }
             case let .receivedMessage(receivedMessage):
                 message = receivedMessage
                 event.cancel(with: .normalClosure, reason: nil)
@@ -186,7 +188,6 @@ final class WebSocketTests: BaseTestCase {
                 didComplete.fulfill()
             }
         }
-        request.send(sentMessage) { _ in didSend.fulfill() }
 
         wait(for: [didConnect, didSend, didReceiveMessage, didDisconnect, didComplete],
              timeout: timeout,

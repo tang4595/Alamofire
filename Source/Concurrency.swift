@@ -627,6 +627,7 @@ extension DataStreamRequest {
     }
 }
 
+#if !(os(Linux) || os(Windows))
 // - MARK: WebSocketTask
 
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
@@ -700,6 +701,7 @@ extension WebSocketRequest {
         WebSocketTask(request: self)
     }
 }
+#endif
 
 extension DispatchQueue {
     fileprivate static let singleEventQueue = DispatchQueue(label: "org.alamofire.concurrencySingleEventQueue",
