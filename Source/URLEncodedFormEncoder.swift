@@ -272,6 +272,7 @@ public final class URLEncodedFormEncoder {
             return result
         }
     }
+
 //
 //    public struct NilEncoding {
 //        public static let drop = NilEncoding { nil }
@@ -287,16 +288,22 @@ public final class URLEncodedFormEncoder {
 //            encoding()
 //        }
 //    }
-    
+
     /// Encoding to use for `nil` values.
     public enum NilEncoding {
-        /// Encodes `nil` by dropping the value entirely.
-        case drop
+        /// Encodes `nil` by dropping the entire key / value pair.
+        case dropKey
+        /// Encodes `nil` by dropping only the value. e.g. `value1=one&nilValue&value2=two`.
+        case dropValue
         /// Encodes `nil` as `null`.
         case null
-        
+
         func encodeNil() -> String? {
-            (self == .null) ? "null" : nil
+            switch self {
+            case .dropKey: return nil
+            case .dropValue: return ""
+            case .null: return "null"
+            }
         }
     }
 
@@ -375,7 +382,7 @@ public final class URLEncodedFormEncoder {
                 dataEncoding: DataEncoding = .base64,
                 dateEncoding: DateEncoding = .deferredToDate,
                 keyEncoding: KeyEncoding = .useDefaultKeys,
-                nilEncoding: NilEncoding = .drop,
+                nilEncoding: NilEncoding = .dropKey,
                 spaceEncoding: SpaceEncoding = .percentEscaped,
                 allowedCharacters: CharacterSet = .afURLQueryAllowed) {
         self.alphabetizeKeyValuePairs = alphabetizeKeyValuePairs
@@ -648,7 +655,7 @@ extension _URLEncodedFormEncoder {
 extension _URLEncodedFormEncoder.KeyedContainer: KeyedEncodingContainerProtocol {
     func encodeNil(forKey key: Key) throws {
         guard let nilValue = nilEncoding.encodeNil() else { return }
-        
+
         try encode(nilValue, forKey: key)
     }
 
@@ -748,7 +755,7 @@ extension _URLEncodedFormEncoder {
 extension _URLEncodedFormEncoder.SingleValueContainer: SingleValueEncodingContainer {
     func encodeNil() throws {
         guard let nilValue = nilEncoding.encodeNil() else { return }
-        
+
         try encode(nilValue)
     }
 
@@ -887,7 +894,7 @@ extension _URLEncodedFormEncoder {
 extension _URLEncodedFormEncoder.UnkeyedContainer: UnkeyedEncodingContainer {
     func encodeNil() throws {
         guard let nilValue = nilEncoding.encodeNil() else { return }
-        
+
         try encode(nilValue)
     }
 

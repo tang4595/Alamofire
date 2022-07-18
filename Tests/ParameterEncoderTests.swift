@@ -825,7 +825,7 @@ final class URLEncodedFormEncoderTests: BaseTestCase {
         // Then
         XCTAssertEqual(result.success, "A=oneTwoThree")
     }
-    
+
     func testThatNilCanBeEncodedAsNull() {
         // Given
         let encoder = URLEncodedFormEncoder(nilEncoding: .null)
