@@ -214,7 +214,7 @@ jobs:
             name: "macOS 12, SPM 5.6.1 Test"
           - xcode: "Xcode_13.3.1.app"
             runsOn: macOS-12
-            name: "macOS 12, SPM 5.6 Test"
+            name: "macOS 12, SPM 5.6.0 Test"
           - xcode: "Xcode_13.2.1.app"
             runsOn: macOS-11
             name: "macOS 11, SPM 5.5.2 Test"
@@ -223,19 +223,28 @@ jobs:
             name: "macOS 11, SPM 5.5.1 Test"
           - xcode: "Xcode_13.0.app"
             runsOn: macOS-11
-            name: "macOS 11, SPM 5.5 Test"
+            name: "macOS 11, SPM 5.5.0 Test"
           - xcode: "Xcode_12.5.1.app"
             runsOn: macOS-11
-            name: "macOS 11, SPM 5.4 Build"
+            name: "macOS 11, SPM 5.4.2 Build"
           - xcode: "Xcode_12.4.app"
             runsOn: macOS-10.15
-            name: "macOS 10.15, SPM 5.3 Build"
+            name: "macOS 10.15, SPM 5.3.2 Build"
+          - xcode: "Xcode_12.3.app"
+            runsOn: macOS-10.15
+            name: "macOS 10.15, SPM 5.3.2 Build"
+          - xcode: "Xcode_12.2.app"
+            runsOn: macOS-10.15
+            name: "macOS 10.15, SPM 5.3.1 Build"
+          - xcode: "Xcode_12.1.app"
+            runsOn: macOS-10.15
+            name: "macOS 10.15, SPM 5.3.0 Build"
     steps:
       - uses: actions/checkout@v3
       - name: Install Firewalk
         run: brew install alamofire/alamofire/firewalk && firewalk &
       - name: Test SPM
-        run: swift build -c debug
+        run: swift test -c debug
   Linux:
     name: Linux
     runs-on: ubuntu-latest
