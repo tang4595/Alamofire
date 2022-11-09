@@ -159,15 +159,18 @@ public struct URLEncoding: ParameterEncoding {
     public func encode(_ urlRequest: URLRequestConvertible, with parameters: Parameters?) throws -> URLRequest {
         var urlRequest = try urlRequest.asURLRequest()
 
-        guard let parameters = parameters else { return urlRequest }
+        var prametersCopy: [String: Any] = parameters ?? [String: Any]()
+        var noneNullParameters: [String: Any] = prametersCopy
+        
+        guard false == noneNullParameters.isEmpty else { return urlRequest }
 
         if let method = urlRequest.method, destination.encodesParametersInURL(for: method) {
             guard let url = urlRequest.url else {
                 throw AFError.parameterEncodingFailed(reason: .missingURL)
             }
 
-            if var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false), !parameters.isEmpty {
-                let percentEncodedQuery = (urlComponents.percentEncodedQuery.map { $0 + "&" } ?? "") + query(parameters)
+            if var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false), !noneNullParameters.isEmpty {
+                let percentEncodedQuery = (urlComponents.percentEncodedQuery.map { $0 + "&" } ?? "") + query(noneNullParameters)
                 urlComponents.percentEncodedQuery = percentEncodedQuery
                 urlRequest.url = urlComponents.url
             }
@@ -176,7 +179,7 @@ public struct URLEncoding: ParameterEncoding {
                 urlRequest.headers.update(.contentType("application/x-www-form-urlencoded; charset=utf-8"))
             }
 
-            urlRequest.httpBody = Data(query(parameters).utf8)
+            urlRequest.httpBody = Data(query(noneNullParameters).utf8)
         }
 
         return urlRequest
